@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	default-autowire="byName" default-lazy-init="false"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+		
+    <util:properties id="config" location="classpath:config.properties"/>
+    <context:property-placeholder location="classpath:config.properties" ignore-unresolvable="true"/>
+    
+    <dubbo:application name="annotation-provider" />   
+	<dubbo:registry protocol="zookeeper" address="${zookeeper.address}" />
+    <!-- <dubbo:registry  protocol="zookeeper" address="172.17.0.119:2181,172.17.0.120:2181,172.17.0.121:2181,172.17.0.122:2181,172.17.0.123:2181" /> -->
+    <dubbo:protocol name="dubbo" port="20880" />
+	<dubbo:annotation package="com.b5m.service" />
+	
+	<bean class="com.google.code.ssm.Settings">
+	  <property name="order" value="0" />
+	</bean>
+	
+	<import resource="simplesm-context.xml" />
+	<aop:aspectj-autoproxy />
+	<bean name="defaultMemcachedClient" class="com.google.code.ssm.CacheFactory">
+		<property name="cacheClientFactory">
+			<bean name="cacheClientFactory"
+				class="com.google.code.ssm.providers.xmemcached.MemcacheClientFactoryImpl" />
+		</property>
+		<property name="addressProvider">
+			<bean class="com.google.code.ssm.config.DefaultAddressProvider">
+				<property name="address" value="${memcached.default.servers}" />
+			</bean>
+		</property>
+		<property name="configuration">
+			<bean class="com.google.code.ssm.providers.CacheConfiguration">
+				<property name="consistentHashing" value="true" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="memcachedClient"
+		class="net.rubyeye.xmemcached.utils.XMemcachedClientFactoryBean">
+		<property name="servers" value="${memcached.default.servers}"></property>
+		<property name="weights">
+			<list>
+				<value>1</value>
+				<value>2</value>
+				<value>3</value>
+			</list>
+		</property>
+		<!-- nio connection pool size -->
+		<property name="connectionPoolSize" value="50"></property>
+		<property name="commandFactory">
+			<bean class="net.rubyeye.xmemcached.command.BinaryCommandFactory"></bean>
+		</property>
+		<!-- Serializing transcoder -->
+		<property name="transcoder">
+			<bean class="net.rubyeye.xmemcached.transcoders.SerializingTranscoder" />
+		</property>
+	</bean>
+	<bean id="xmemcachedProxy" class="com.b5m.base.common.utils.cache.XMemcachedProxy">
+		<constructor-arg index="0" ref="memcachedClient"></constructor-arg>
+		<property name="retriveTimeout" value="5000"></property>
+		<property name="writeTimeout" value="5000"></property>
+	</bean>
+	<bean class="com.b5m.base.common.utils.cache.MemCachedUtils">
+    	<property name="proxy" ref="xmemcachedProxy"></property>
+    </bean>
+    <bean class="com.b5m.base.common.spring.aop.CacheAop"/>
+	
+    <bean id="sf1Query" class="com.b5m.sf1api.service.impl.Sf1QueryImpl">
+    	<constructor-arg index="0" ref="config"/>
+    </bean>
+    
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${jdbc.driverClassName}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="minPoolSize" value="5"></property>
+		<property name="maxPoolSize" value="20"></property>
+		<property name="maxIdleTime" value="1800"></property>
+		<property name="initialPoolSize" value="5"></property>
+		<property name="preferredTestQuery" value="select count(*) from Dual"></property>
+		<property name="idleConnectionTestPeriod" value="1200"></property>
+		<property name="properties">
+			<props>
+				<prop key="user">${jdbc.username}</prop>
+				<prop key="password">${jdbc.password}</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="dao" class="com.b5m.dao.impl.DaoImpl">
+		<constructor-arg ref="dataSource"/>
+	</bean>
+	
+	<bean id="httpConnectionMgr" class="org.apache.commons.httpclient.MultiThreadedHttpConnectionManager">
+		<property name="params">
+			<bean class="org.apache.commons.httpclient.params.HttpConnectionManagerParams">
+				<property name="connectionTimeout" value="6000"></property>
+				<property name="soTimeout" value="6000"></property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="clientHttpClientFactory" class="com.b5m.service.client.HttpClientFactory">
+		<constructor-arg index="0" ref="httpConnectionMgr"/>
+	</bean>
+	
+	<!-- sf1 新的autofill -->
+	<bean id="sf1AutoFillClient" class="com.b5m.service.client.autofill.SF1AutoFillClientImpl">
+		<constructor-arg index="0" value="${auto.fill.client.url}"/>
+		<constructor-arg index="1" ref="clientHttpClientFactory"/>
+	</bean>
+	
+	<bean id="ontimeClient" class="com.b5m.service.client.ontimeprice.OntimeClientImpl">
+		<constructor-arg index="0" value="${ontime.price.link}"/>
+		<constructor-arg index="1" value="${ontime.detail.price.link}"/>
+		<constructor-arg index="2" ref="clientHttpClientFactory"/>
+	</bean>
+	
+	<bean class="com.b5m.base.common.spring.utils.ApplicationContextUtils"/>
+	<!-- <bean class="com.b5m.service.pricetrend.PriceTrendUtils">
+		<property name="hbaseDataService" ref="hbaseDataService"/>
+	</bean> -->
+</beans>
