@@ -3,6 +3,7 @@ package com.b5m.service.sf1.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -11,14 +12,17 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.b5m.base.common.spring.aop.Cache;
 import com.b5m.base.common.utils.ThreadTools;
+import com.b5m.bean.dto.SuiSearchDto;
 import com.b5m.service.client.autofill.SF1AutoFillClient;
 import com.b5m.service.sf1.SF1QueryService;
 import com.b5m.service.sf1.bean.AutoFillInfo;
-import com.b5m.service.sf1.bean.SuiSearchDto;
 import com.b5m.service.sf1.helper.SearchHelper;
 import com.b5m.sf1api.dto.req.SF1SearchBean;
 import com.b5m.sf1api.dto.res.SearchDTO;
@@ -32,6 +36,10 @@ public class SF1QueryServiceImpl implements SF1QueryService{
 	private SF1AutoFillClient sf1AutoFillClient;
 	private ExecutorService threadPool;
 	
+	@Autowired
+	@Qualifier("config")
+	private Properties config;
+	
 	public SF1QueryServiceImpl(){
 		threadPool = new ThreadPoolExecutor(2, 5,  0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 	}
@@ -39,13 +47,27 @@ public class SF1QueryServiceImpl implements SF1QueryService{
 	public SF1QueryServiceImpl(ExecutorService threadPool) {
 		this.threadPool = threadPool;
 	}
+	
+	@Override
+	public JSONObject forecastPrice(JSONArray forecast){
+		String collection = "aggregator";
+		return sf1Query.forecastPrice(forecast, "aggregator", getSf1Path(collection));
+	}
+	
+	@Override
+	public JSONObject forecastPrice(JSONArray forecast, String collection){
+		if(StringUtils.isEmpty(collection)){
+			collection = "aggregator";
+		}
+		return sf1Query.forecastPrice(forecast, collection, getSf1Path(collection));
+	}
 
 	@Override
 	public SearchDTO search(SuiSearchDto dto) {
 		dto.setCollectionName(dto.getCollectionName());
 		dto.setRequireRelated(true);
 		SF1SearchBean searchBean = SearchHelper.convertTo4Search(dto);
-		SearchDTO searchDTO = sf1Query.doSearch(searchBean);
+		SearchDTO searchDTO = sf1Query.doSearch(searchBean, getSf1Path(dto.getCollectionName()));
 		return searchDTO;
 	}
 
@@ -116,6 +138,17 @@ public class SF1QueryServiceImpl implements SF1QueryService{
 			k = prefix + "|" + city;
 		}
 		return sf1AutoFillClient.allAutoFillSearch(k, limit);
+	}
+	
+	protected String getSf1Path(String collection) {
+		String ipName = "server_ip";
+		if (!StringUtils.isEmpty(collection)) {
+			ipName += "_" + collection;
+		}
+		String ip = config.getProperty(ipName);
+		String port = config.getProperty("port_num");
+		String server = config.getProperty("server_path");
+		return new StringBuilder().append("http://").append(ip).append(":").append(port).append("/").append(server).toString();
 	}
 
 }

@@ -24,7 +24,7 @@ import com.b5m.service.pricetrend.PriceTrendUtils;
 public class PriceTrendServiceImpl implements PriceTrendService{
 
 	@Override
-	public String priceTrendTyp(String[] docIds, Integer range) {
+	public String priceTrendType(String[] docIds, Integer range) {
 		return PriceTrendUtils.getPriceTrendType(docIds, range);
 	}
 

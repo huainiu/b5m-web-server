@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<channels>
+	<channel>
+		<displayName>淘沙</displayName>
+		<name>taosha</name>
+		<collection>taosha</collection>
+		<domain>tao</domain>
+		<pageSize>36</pageSize>
+		<resultPage>commpage/resultlist</resultPage>
+		<noResultPage>taosha/noresult</noResultPage>
+		<!-- 属性过滤功能 -->
+		<filterAttr>false</filterAttr>
+		<needMoreResearch>false</needMoreResearch>
+		<categoryUrl>false</categoryUrl>
+		<serverPath>http://10.10.99.188:8888/sf1r</serverPath>
+		<headerCss>http://y.b5mcdn.com/css/search/search_head_v3.css</headerCss>
+	</channel>
+	<channel>
+		<displayName>淘沙New</displayName>
+		<name>tsdian</name>
+		<collection>taosha</collection>
+		<domain>tsdian</domain>
+		<pageSize>36</pageSize>
+		<resultPage>tsdian/resultlist</resultPage>
+		<noResultPage>tsdian/noresult</noResultPage>
+		<!-- 属性过滤功能 -->
+		<filterAttr>false</filterAttr>
+		<needMoreResearch>false</needMoreResearch>
+		<categoryUrl>false</categoryUrl>
+		<serverPath>http://10.10.99.188:8888/sf1r</serverPath>
+	</channel>
+	<channel>
+		<displayName>日本馆</displayName>
+		<name>japan</name>
+		<collection>japan</collection>
+		<domain>jp</domain>
+		<pageSize>36</pageSize>
+		<resultPage>commpage/resultlist</resultPage>
+		<noResultPage>japan/noresult</noResultPage>
+		<!-- 属性过滤功能 -->
+		<filterAttr>false</filterAttr>
+		<needMoreResearch>false</needMoreResearch>
+		<serverPath>http://10.10.99.188:8888/sf1r</serverPath>
+		<categoryUrl>false</categoryUrl>
+		<headerCss>http://y.b5mcdn.com/css/haiwai/america/header.css</headerCss>
+	</channel>
+	<channel>
+		<displayName>www搜索</displayName>
+		<name>s</name>
+		<collection>b5mp</collection>
+		<domain>s</domain>
+		<pageSize>36</pageSize>
+		<resultPage>commpage/resultlist</resultPage>
+		<noResultPage>s/noresult</noResultPage>
+		<!-- 属性过滤功能 -->
+		<filterAttr>true</filterAttr>
+		<needMoreResearch>true</needMoreResearch>
+		<categoryUrl>true</categoryUrl>
+		<serverPath>http://10.10.96.188:8888/sf1r</serverPath>
+		<headerCss>http://y.b5mcdn.com/css/search/search_head_v3.css</headerCss>
+	</channel>
+	<channel>
+		<displayName>海外搜索</displayName>
+		<name>haiwai</name>
+		<collection>haiwaip</collection>
+		<domain>haiwai</domain>
+		<pageSize>36</pageSize>
+		<resultPage>commpage/resultlist</resultPage>
+		<noResultPage>haiwai/noresult</noResultPage>
+		<!-- 属性过滤功能 -->
+		<filterAttr>true</filterAttr>
+		<needMoreResearch>true</needMoreResearch>
+		<categoryUrl>true</categoryUrl>
+		<serverPath>http://10.10.99.188:8888/sf1r</serverPath>
+		<headerCss>http://y.b5mcdn.com/css/haiwai/header.css</headerCss>
+	</channel>
+	<channel>
+		<displayName>美国馆搜索</displayName>
+		<name>usa</name>
+		<collection>haiwaip</collection>
+		<domain>usa</domain>
+		<country>美国</country>
+		<pageSize>36</pageSize>
+		<resultPage>commpage/resultlist</resultPage>
+		<noResultPage>usa/noresult</noResultPage>
+		<!-- 属性过滤功能 -->
+		<filterAttr>true</filterAttr>
+		<needMoreResearch>true</needMoreResearch>
+		<categoryUrl>true</categoryUrl>
+		<serverPath>http://10.10.99.188:8888/sf1r</serverPath>
+		<headerCss>http://y.b5mcdn.com/css/haiwai/america/header.css</headerCss>
+	</channel>
+	<channel>
+		<displayName>韩国馆搜索</displayName>
+		<name>korea</name>
+		<country>韩国</country>
+		<collection>haiwaip</collection>
+		<domain>korea</domain>
+		<pageSize>36</pageSize>
+		<resultPage>commpage/resultlist</resultPage>
+		<noResultPage>korea/noresult</noResultPage>
+		<!-- 属性过滤功能 -->
+		<filterAttr>true</filterAttr>
+		<needMoreResearch>true</needMoreResearch>
+		<categoryUrl>true</categoryUrl>
+		<serverPath>http://10.10.99.177:8888/sf1r</serverPath>
+		<headerCss>http://y.b5mcdn.com/css/korea/header.css</headerCss>
+	</channel>
+</channels>

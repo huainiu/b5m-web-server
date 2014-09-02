@@ -25,6 +25,7 @@
     <!-- <dubbo:registry  protocol="zookeeper" address="172.17.0.119:2181,172.17.0.120:2181,172.17.0.121:2181,172.17.0.122:2181,172.17.0.123:2181" /> -->
     <dubbo:protocol name="dubbo" port="20880" />
 	<dubbo:annotation package="com.b5m.service" />
+	<context:component-scan base-package="com.b5m.controller"/>
 	
 	<bean class="com.google.code.ssm.Settings">
 	  <property name="order" value="0" />
@@ -133,4 +134,24 @@
 	<!-- <bean class="com.b5m.service.pricetrend.PriceTrendUtils">
 		<property name="hbaseDataService" ref="hbaseDataService"/>
 	</bean> -->
+	
+	<!-- jackjson -->
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 页面分发器 -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/WEB-INF/" />
+		<property name="suffix" value=".jsp" />
+		<property name="cache" value="true" />
+	</bean>
+	
+	<mvc:annotation-driven />
+	<mvc:default-servlet-handler/>
 </beans>
